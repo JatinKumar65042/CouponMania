@@ -1,1 +1,1 @@
-export const BASEURL = `https://your-render-backend-url/api/v1`
+export const BASEURL = `https://couponmania.onrender.com/api/v1`
