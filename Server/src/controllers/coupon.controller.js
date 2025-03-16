@@ -55,12 +55,13 @@ const generateCoupons = async (req, res) => {
 const claimCoupon = async (req, res) => {
     try {
         const userIP = req.ip; 
-        const userSession = req.cookies?.sessionId; 
+        let userSession = req.cookies?.sessionId;
         const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000); 
 
+        // If session cookie does not exist, create a new session ID
         if (!userSession) {
-            const sessionId = Math.random().toString(36).substring(2); 
-            res.cookie("sessionId", sessionId, {
+            userSession = Math.random().toString(36).substring(2); 
+            res.cookie("sessionId", userSession, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "Strict",
@@ -68,22 +69,29 @@ const claimCoupon = async (req, res) => {
             });
         }
 
-        const recentClaim = await Coupon.findOne({
-            $or: [
-                { claimedBy: userIP, claimedAt: { $gte: oneDayAgo } }, 
-                { claimedBy: userSession, claimedAt: { $gte: oneDayAgo } }, 
-            ]
-        });
+        // Check if the user has already claimed via IP or session ID
+        const recentClaimIP = await Coupon.findOne({ claimedBy: userIP, claimedAt: { $gte: oneDayAgo } });
+        const recentClaimSession = await Coupon.findOne({ claimedBy: userSession, claimedAt: { $gte: oneDayAgo } });
 
-        if (recentClaim) {
+        // If the same IP has already claimed, deny only if the current request is also from the same IP
+        if (recentClaimIP && userIP === recentClaimIP.claimedBy) {
             return res.status(403).json({
                 success: false,
-                message: "❌ You have already claimed a coupon. Try again after 24 hours."
+                message: "❌ This IP has already claimed a coupon. Try again after 24 hours."
             });
         }
 
+        // If the same browser session has already claimed, deny only if the current request is from the same session
+        if (recentClaimSession && userSession === recentClaimSession.claimedBy) {
+            return res.status(403).json({
+                success: false,
+                message: "❌ This session has already claimed a coupon. Try again after 24 hours."
+            });
+        }
+
+        // Find and claim an available coupon
         const coupon = await Coupon.findOneAndUpdate(
-            { isClaimed: false, isActive: true }, // ✅ Only claim active coupons
+            { isClaimed: false, isActive: true },
             { isClaimed: true, claimedBy: userSession || userIP, claimedAt: new Date() },
             { new: true }
         );
@@ -100,6 +108,7 @@ const claimCoupon = async (req, res) => {
             message: `✅ Coupon claimed successfully! Your coupon code is: ${coupon.code}`,
             coupon
         });
+
     } catch (error) {
         res.status(500).json({
             success: false,
@@ -108,6 +117,8 @@ const claimCoupon = async (req, res) => {
         });
     }
 };
+
+
 
 const toggleCouponAvailability = async (req, res) => {
     try {
