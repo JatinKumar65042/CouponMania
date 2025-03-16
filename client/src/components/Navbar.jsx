@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router"; // ✅ Fix import
-import { BASEURL } from "../baseurl";
+import { BASEURL } from "../baseurl.js";
 
 function Navbar() {
     const [user, setUser] = useState(null);
