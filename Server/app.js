@@ -9,8 +9,12 @@ config() ;
 
 const app = express() ;
 const _dirname = path.resolve() ;
+const allowedOrigins = [
+    "http://localhost:5173",  // ✅ Development frontend
+    "https://couponmania.onrender.com" // ✅ Production frontend
+];
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: allowedOrigins,
     credentials: true
 }))
 
