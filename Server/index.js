@@ -7,7 +7,7 @@ connecttoDB()
         console.log("Error : ", error) ;
         throw error ;
     })
-    app.listen(process.env.PORT || 8000 , () => {
+    app.listen(process.env.PORT || 5000 , () => {
         console.log(`⚙️   Server is running on http://localhost:${process.env.PORT}/api/v1/`) ;
     })
 })

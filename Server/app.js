@@ -27,7 +27,6 @@ app.use('/api/v1/coupon' , couponRoutes)
 
 app.use(express.static(path.join(_dirname , "/client/dist")))
 app.get("*", (req, res) => {
-    if (req.path.startsWith("/api/")) return; // Ensure API routes are not affected
     res.sendFile(path.resolve(_dirname, "client", "dist", "index.html"));
 });
 
