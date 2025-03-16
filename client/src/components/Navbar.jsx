@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router"; // ✅ Fix import
+import { BASEURL } from "../baseurl";
 
 function Navbar() {
     const [user, setUser] = useState(null);
@@ -12,7 +13,7 @@ function Navbar() {
 
     const logout = async () => {
         try {
-            await fetch("http://localhost:5000/api/v1/user/logout", {
+            await fetch(`${BASEURL}/user/logout`, {
                 method: "GET",
                 credentials: "include", // ✅ Ensures cookies are cleared
             });
