@@ -1,1 +1,1 @@
-export const BASEURL = `http://localhost:5000/api/v1`
+export const BASEURL = `https://your-render-backend-url/api/v1`

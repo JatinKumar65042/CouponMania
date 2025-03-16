@@ -17,7 +17,11 @@ function Login() {
                 credentials: "include", // Ensures cookies (JWT) are sent
             });
 
+            console.log("Response Status:", response.status);
+            console.log("Response Headers:", response.headers);
+
             const data = await response.json();
+            console.log("Response Data:", data);
             if (data.success) {
                 localStorage.setItem("user", JSON.stringify(data.user)); // Store user data
                 navigate("/"); // ✅ Redirect to Home Page
